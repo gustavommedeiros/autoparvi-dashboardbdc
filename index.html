@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Autoparvi — Painel do Diretor</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F0F2F5;--bg2:#FFFFFF;--bg3:#F5F6F8;--bg4:#EAECEF;
+  --border:#D8DCE3;--border2:#C5CAD3;
+  --text:#1A2332;--text2:#4A5568;--text3:#8A95A3;
+  --blue:#1565C0;--blue-lt:#E3EEF9;
+  --green:#2E7D32;--green-lt:#E8F5E9;
+  --red:#C62828;--red-lt:#FFEBEE;
+  --orange:#E65100;--orange-lt:#FFF3E0;
+  --gold:#B8860B;--gold-lt:#FFF8DC;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-top:env(safe-area-inset-top,0px);
+  --shadow:0 1px 3px rgba(0,0,0,.10),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.05);
+}
+html,body{height:100%;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+
+/* HEADER */
+.header{background:#1A2332;padding:12px 20px;padding-top:calc(12px + var(--safe-top));display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:0;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.logo-dot{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#1976D2,#0D47A1);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.header-text h1{font-size:14px;font-weight:600;color:#FFF;line-height:1.2}
+.header-text p{font-size:11px;color:#8A9BB5;margin-top:1px}
+.header-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.date-chip{background:#253347;border:1px solid #364760;border-radius:6px;padding:4px 10px;font-size:11px;color:#90CAF9;font-weight:600;white-space:nowrap;font-family:'SF Mono','Consolas',monospace}
+
+/* SUBHEADER */
+.subheader{display:flex;gap:6px;padding:8px 16px;background:#253347;border-bottom:1px solid #364760;overflow-x:auto;align-items:center}
+.lp-pill{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid;white-space:nowrap;flex-shrink:0}
+.p-mns{background:#1A3560;color:#90CAF9;border-color:#2A5090}
+.p-bv{background:#2E1A5A;color:#CE93D8;border-color:#5B2D8A}
+.p-stat{background:#1E2D42;color:#8A9BB5;border-color:#364760}
+.p-ok{background:#1B3A1E;color:#81C784;border-color:#2E6B32}
+.p-warn{background:#3A2800;color:#FFB74D;border-color:#6B4A00}
+
+/* TABS */
+.tabs-bar{display:flex;background:#FFF;border-top:1px solid var(--border);position:fixed;bottom:0;left:0;right:0;z-index:200;padding-bottom:var(--safe-bottom);box-shadow:0 -2px 8px rgba(0,0,0,.08)}
+.tab-btn{flex:1;padding:10px 4px 8px;border:none;background:transparent;color:var(--text3);font-size:10px;cursor:pointer;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:52px;justify-content:center;font-family:inherit}
+.tab-btn .ti{font-size:18px;line-height:1}
+.tab-btn.active{color:var(--blue)}
+.tab-btn.active .ti-label{color:var(--blue);font-weight:600}
+
+/* CONTENT */
+.content{padding:14px 16px;padding-bottom:calc(68px + var(--safe-bottom));max-width:1200px;margin:0 auto}
+.sec{display:none;animation:fadeIn .18s ease}.sec.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* CHIPS / BADGES */
+.chip{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap}
+.chip-ok{background:var(--green-lt);color:var(--green)}
+.chip-warn{background:var(--orange-lt);color:var(--orange)}
+.chip-danger{background:var(--red-lt);color:var(--red)}
+.chip-gold{background:var(--gold-lt);color:var(--gold)}
+.chip-blue{background:var(--blue-lt);color:var(--blue)}
+.tag{display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.03em}
+.tag-mns{background:#1A3560;color:#90CAF9}
+.tag-bv{background:#2E1A5A;color:#CE93D8}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;box-shadow:var(--shadow)}
+.sec-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* META BANNER */
+.meta-banner{background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border:1px solid #A5D6A7;border-radius:10px;padding:14px 16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.mb-badge{display:inline-block;background:var(--green);color:#FFF;border-radius:4px;padding:3px 9px;font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:6px}
+.mb-title{font-size:15px;font-weight:700;color:var(--green);margin-bottom:3px}
+.mb-sub{font-size:12px;color:#558B2F}
+.mb-stats{display:flex;border-top:1px solid #C8E6C9;margin-top:10px;padding-top:10px}
+.mb-stat{flex:1;text-align:center;border-right:1px solid #C8E6C9}
+.mb-stat:last-child{border-right:none}
+.mb-v{font-size:20px;font-weight:700;color:var(--green);font-family:'SF Mono','Consolas',monospace;line-height:1}
+.mb-l{font-size:9px;color:#558B2F;text-transform:uppercase;letter-spacing:.04em;margin-top:3px}
+
+/* PERIODO BANNER */
+.periodo-banner{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow)}
+.pb-left .pb-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:3px}
+.pb-left .pb-title{font-size:14px;font-weight:600;color:var(--text)}
+.pb-left .pb-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.pb-right{text-align:right}
+.pb-dias{font-size:30px;font-weight:700;color:var(--blue);font-family:'SF Mono','Consolas',monospace;line-height:1}
+.pb-dias-l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;gap:10px;margin-bottom:12px;grid-template-columns:repeat(2,1fr)}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:10px 10px 0 0}
+.kpi-ok::before{background:var(--green)}.kpi-warn::before{background:var(--orange)}.kpi-danger::before{background:var(--red)}.kpi-blue::before{background:var(--blue)}.kpi-gold::before{background:var(--gold)}
+.kpi .k-l{font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.kpi .k-v{font-size:22px;font-weight:700;font-family:'SF Mono','Consolas',monospace;line-height:1}
+.kpi-ok .k-v{color:var(--green)}.kpi-warn .k-v{color:var(--orange)}.kpi-danger .k-v{color:var(--red)}.kpi-blue .k-v{color:var(--blue)}.kpi-gold .k-v{color:var(--gold)}
+.kpi .k-s{font-size:11px;color:var(--text2);margin-top:5px;line-height:1.4}
+.kpi-wide{grid-column:span 2}
+
+/* PROGRESSO */
+.pw-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.pw-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+.pw-row{margin-bottom:12px}.pw-row:last-child{margin-bottom:0}
+.pw-info{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+.pw-label{font-size:13px;color:var(--text2);font-weight:500}
+.pw-val{font-size:13px;font-weight:700;font-family:'SF Mono','Consolas',monospace}
+.pw-sub{font-size:11px;color:var(--text3);margin-bottom:5px}
+.bar-bg{background:var(--bg4);border-radius:4px;height:6px;overflow:hidden}
+.bar-f{height:6px;border-radius:4px;transition:width .4s ease}
+
+/* LOJA RESUMO */
+.loja-resumo{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.lr-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow)}
+.lr-head{display:flex;align-items:center;gap:6px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.lr-title{font-size:13px;font-weight:600;color:var(--text)}
+.lr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.lr-item{text-align:center;padding:6px 4px;background:var(--bg3);border-radius:6px}
+.lr-v{font-size:16px;font-weight:700;font-family:'SF Mono','Consolas',monospace;color:var(--text);line-height:1}
+.lr-l{font-size:9px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:.03em}
+
+/* LOJA SUMMARY (Geral) */
+.loja-sum{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.ls-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px;box-shadow:var(--shadow)}
+.ls-head{display:flex;align-items:center;gap:6px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.ls-title{font-size:13px;font-weight:600}
+.ls-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--bg4);font-size:12px}
+.ls-row:last-child{border-bottom:none}
+.ls-k{color:var(--text2);font-size:11px}.ls-v{font-weight:600;font-family:'SF Mono','Consolas',monospace;font-size:12px}
+
+/* FUNIL */
+.funil-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;overflow-x:auto;box-shadow:var(--shadow)}
+.funil{display:flex;align-items:stretch;min-width:480px}
+.fs{flex:1;min-width:64px;background:var(--bg3);border:1px solid var(--border);padding:10px 6px;text-align:center}
+.fs:first-child{border-radius:8px 0 0 8px}.fs:last-child{border-radius:0 8px 8px 0}
+.fs-l{font-size:9px;color:var(--text3);margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.03em;line-height:1.2}
+.fs-v{font-size:16px;font-weight:700;color:var(--text);font-family:'SF Mono','Consolas',monospace}
+.fs-p{font-size:10px;margin-top:3px;font-weight:600}
+.fs-ok{color:var(--green)}.fs-warn{color:var(--orange)}.fs-danger{color:var(--red)}.fs-neu{color:var(--text3)}.fs-blue{color:var(--blue)}
+.funil-arr{display:flex;align-items:center;color:var(--text3);font-size:13px;padding:0 1px;flex-shrink:0}
+
+/* VENDOR CARDS */
+.card-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.vcard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow)}
+.vcard.hidden{display:none}
+.vc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.vc-left{display:flex;align-items:center;gap:8px}
+.vc-right{display:flex;align-items:center;gap:6px}
+.vc-rank{width:22px;height:22px;border-radius:4px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);font-weight:600;flex-shrink:0}
+.vc-name{font-size:13px;font-weight:600;color:var(--text)}
+.vc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.vc-item{background:var(--bg3);border-radius:6px;padding:7px 8px;text-align:center}
+.vc-item-hl{background:var(--bg4);border:1px solid var(--border2)}
+.vc-v{font-size:15px;font-weight:700;font-family:'SF Mono','Consolas',monospace;color:var(--text);line-height:1}
+.vc-l{font-size:9px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:.03em}
+.vc-bar{margin-top:4px}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.fl-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}
+.fl-btn{padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-size:12px;cursor:pointer;font-weight:500;min-height:30px;font-family:inherit}
+.fl-btn.act-all{background:var(--text);color:#FFF;border-color:var(--text)}
+.fl-btn.act-mns{background:#1A3560;color:#90CAF9;border-color:#2A5090}
+.fl-btn.act-bv{background:#2E1A5A;color:#CE93D8;border-color:#5B2D8A}
+
+/* FEIRÃO */
+.feirao-filter{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.feirao-content{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow)}
+.feirao-head{padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.feirao-head-title{font-size:13px;font-weight:600;color:var(--text)}
+.feirao-head-stats{display:flex;gap:12px}
+.fhs{text-align:center}
+.fhs-v{font-size:16px;font-weight:700;font-family:'SF Mono','Consolas',monospace;color:var(--blue)}
+.fhs-l{font-size:9px;color:var(--text3);text-transform:uppercase}
+.ft-row{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-bottom:1px solid var(--bg4);font-size:13px}
+.ft-row:last-child{border-bottom:none}
+.ft-total{background:var(--bg3);font-weight:600}
+.ft-n{color:var(--text2);font-size:12px;flex:1;display:flex;align-items:center;gap:6px}
+.ft-cols{display:flex;gap:16px}
+.ft-c{text-align:right;min-width:42px}
+.ft-v{font-size:13px;font-weight:700;font-family:'SF Mono','Consolas',monospace;color:var(--text)}
+.ft-l{font-size:9px;color:var(--text3);text-transform:uppercase}
+
+/* INFO BOX */
+.info-box{background:var(--blue-lt);border:1px solid #BBDEFB;border-radius:8px;padding:10px 14px;font-size:12px;color:#1565C0;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+
+.footer{text-align:center;padding:14px;color:var(--text3);font-size:10px;border-top:1px solid var(--border);margin-top:8px}
+
+@media(min-width:768px){
+  .kpi-strip{grid-template-columns:repeat(5,1fr)}.kpi-wide{grid-column:span 1}
+  .kpi .k-v{font-size:24px}
+  .vc-grid{grid-template-columns:repeat(4,1fr)}
+  .lr-grid{grid-template-columns:repeat(6,1fr)}
+}
+@media(min-width:1024px){
+  .tabs-bar{position:sticky;top:0;bottom:auto;border-top:none;border-bottom:1px solid var(--border);padding-bottom:0;overflow-x:auto;box-shadow:0 2px 4px rgba(0,0,0,.06)}
+  .tab-btn{flex-direction:row;gap:6px;padding:12px 18px;min-height:auto;font-size:13px;border-bottom:2px solid transparent;flex:none}
+  .tab-btn .ti{font-size:15px}
+  .tab-btn.active{border-bottom-color:var(--blue);color:var(--blue)}
+  .content{padding-bottom:20px}
+  .card-list{display:grid;grid-template-columns:repeat(2,1fr)}
+}
+@media(min-width:1280px){.card-list{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-dot">🚗</div>
+    <div class="header-text"><h1>Autoparvi Seminovos</h1><p>Painel do Diretor · Regional Norte</p></div>
+  </div>
+  <span class="date-chip">01–03/06/26</span>
+</div>
+
+<div class="subheader">
+  <span class="lp-pill p-mns">🔵 Manaus</span>
+  <span class="lp-pill p-bv">🟣 Boa Vista</span>
+  <span class="lp-pill p-stat">Junho/2026</span>
+  <span class="lp-pill p-stat">25d restantes</span>
+  <span class="lp-pill p-warn">29.0% BDC</span>
+</div>
+
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="show('geral',this)"><span class="ti">📊</span><span class="ti-label">Geral</span></button>
+  <button class="tab-btn" onclick="show('bdc',this)"><span class="ti">📱</span><span class="ti-label">BDC</span></button>
+  <button class="tab-btn" onclick="show('fluxo',this)"><span class="ti">🚶</span><span class="ti-label">Fluxo</span></button>
+  <button class="tab-btn" onclick="show('feirao',this)"><span class="ti">🔥</span><span class="ti-label">Feirão</span></button>
+  <button class="tab-btn" onclick="show('vendedores',this)"><span class="ti">👥</span><span class="ti-label">Equipe</span></button>
+</div>
+
+<div class="content">
+
+<!-- ═══ VISÃO GERAL ═══ -->
+<div id="geral" class="sec active">
+
+
+
+<div class="periodo-banner">
+  <div class="pb-left">
+    <div class="pb-label">Mês em andamento</div>
+    <div class="pb-title">Junho/2026</div>
+    <div class="pb-sub">55 visitas agendadas · ~22 pot. vendas</div>
+  </div>
+  <div class="pb-right">
+    <div class="pb-dias">25</div>
+    <div class="pb-dias-l">dias restantes</div>
+  </div>
+</div>
+
+<div class="sec-title" style="margin-top:0">KPIs do mês — 01–03/06/26</div>
+<div class="kpi-strip">
+  <div class="kpi kpi-blue"><div class="k-l">Carteira leads</div><div class="k-v">936</div><div class="k-s">BV 175 · MNS 761</div></div>
+  <div class="kpi kpi-warn"><div class="k-l">% Agendamento</div><div class="k-v">23.0%</div><div class="k-s">Meta 40% · 26 agend. ÷ 113 incl.</div></div>
+  <div class="kpi kpi-ok"><div class="k-l">% Visitas</div><div class="k-v">27.4%</div><div class="k-s">Meta 20% · 31 vis. ÷ 113 incl.</div></div>
+  <div class="kpi kpi-warn"><div class="k-l">Conv. BDC</div><div class="k-v">29.0%</div><div class="k-s">Meta 40% · 9 vd. ÷ 31 vis.</div></div>
+  <div class="kpi kpi-ok kpi-wide"><div class="k-l">Fluxo showroom</div><div class="k-v">32</div><div class="k-s">28.1% conv. · 9 vendas · BV 7 · MNS 25</div></div>
+</div>
+
+<div class="pw-wrap">
+  <div class="pw-title">Progresso das metas</div>
+  <div class="pw-row">
+      <div class="pw-info">
+        <span class="pw-label">Meta 1 — Agendamento / Incluídos</span>
+        <span class="pw-val" style="color:#C62828">23.0% </span>
+      </div>
+      <div class="pw-sub">26 agend. ÷ 113 incl. &nbsp;·&nbsp; meta 40%</div>
+      <div class="bar-bg"><div class="bar-f" style="width:58%;background:#C62828"></div></div>
+    </div>
+  <div class="pw-row">
+      <div class="pw-info">
+        <span class="pw-label">Meta 2 — Visitas realizadas / Incluídos</span>
+        <span class="pw-val" style="color:#2E7D32">27.4% ✓</span>
+      </div>
+      <div class="pw-sub">31 vis. ÷ 113 incl. &nbsp;·&nbsp; meta 20%</div>
+      <div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div>
+    </div>
+  <div class="pw-row">
+      <div class="pw-info">
+        <span class="pw-label">Meta 3 — Conv. BDC: Vendas / Visitas</span>
+        <span class="pw-val" style="color:#C62828">29.0% </span>
+      </div>
+      <div class="pw-sub">9 vd. ÷ 31 vis. &nbsp;·&nbsp; meta 40%</div>
+      <div class="bar-bg"><div class="bar-f" style="width:73%;background:#C62828"></div></div>
+    </div>
+  <div class="pw-row">
+      <div class="pw-info">
+        <span class="pw-label">Showroom conversão</span>
+        <span class="pw-val" style="color:#E65100">28.1% </span>
+      </div>
+      <div class="pw-sub">9 vendas ÷ 32 fluxo &nbsp;·&nbsp; meta 30%</div>
+      <div class="bar-bg"><div class="bar-f" style="width:94%;background:#E65100"></div></div>
+    </div>
+  <div class="pw-row">
+      <div class="pw-info">
+        <span class="pw-label">Cancelamentos / Agend. total</span>
+        <span class="pw-val" style="color:#C62828">18.8% </span>
+      </div>
+      <div class="pw-sub">6 canc. ÷ 32 total &nbsp;·&nbsp; meta 20%</div>
+      <div class="bar-bg"><div class="bar-f" style="width:94%;background:#C62828"></div></div>
+    </div>
+</div>
+
+<div class="sec-title">Por loja</div>
+<div class="loja-sum">
+  <div class="ls-card">
+    <div class="ls-head"><span class="tag tag-mns">MNS</span><span class="ls-title">Manaus</span></div>
+    <div class="ls-row"><span class="ls-k">Incluídos</span><span class="ls-v">102</span></div>
+    <div class="ls-row"><span class="ls-k">Agendamentos</span><span class="ls-v" style="color:var(--orange)">25 (24.5%)</span></div>
+    <div class="ls-row"><span class="ls-k">Vis. realizadas</span><span class="ls-v">25</span></div>
+    <div class="ls-row"><span class="ls-k">Cancelados</span><span class="ls-v" style="color:var(--red)">5</span></div>
+    <div class="ls-row"><span class="ls-k">Sucesso BDC</span><span class="ls-v" style="color:var(--green)">7 (28.0%)</span></div>
+    <div class="ls-row"><span class="ls-k">Faturados</span><span class="ls-v">0</span></div>
+    <div class="ls-row"><span class="ls-k">Fluxo show.</span><span class="ls-v">25 · 7 vd. (28.0%)</span></div>
+  </div>
+  <div class="ls-card">
+    <div class="ls-head"><span class="tag tag-bv">BV</span><span class="ls-title">Boa Vista</span></div>
+    <div class="ls-row"><span class="ls-k">Incluídos</span><span class="ls-v">11</span></div>
+    <div class="ls-row"><span class="ls-k">Agendamentos</span><span class="ls-v" style="color:var(--orange)">1 (9.1%)</span></div>
+    <div class="ls-row"><span class="ls-k">Vis. realizadas</span><span class="ls-v">6</span></div>
+    <div class="ls-row"><span class="ls-k">Cancelados</span><span class="ls-v" style="color:var(--orange)">1</span></div>
+    <div class="ls-row"><span class="ls-k">Sucesso BDC</span><span class="ls-v" style="color:var(--green)">2 (33.3%)</span></div>
+    <div class="ls-row"><span class="ls-k">Faturados</span><span class="ls-v">0</span></div>
+    <div class="ls-row"><span class="ls-k">Fluxo show.</span><span class="ls-v">7 · 2 vd. (28.6%)</span></div>
+  </div>
+</div>
+
+<div class="sec-title">Funil consolidado</div>
+<div class="funil-wrap"><div class="funil">
+  <div class="fs"><div class="fs-l">Incluídos</div><div class="fs-v">113</div><div class="fs-p fs-neu">base</div></div>
+  <div class="funil-arr">›</div>
+  <div class="fs"><div class="fs-l">Ag. Novas</div><div class="fs-v">26</div><div class="fs-p fs-warn">23.0%</div></div>
+  <div class="funil-arr">›</div>
+  <div class="fs"><div class="fs-l">Ag. Total</div><div class="fs-v">32</div><div class="fs-p fs-blue">acum.</div></div>
+  <div class="funil-arr">›</div>
+  <div class="fs"><div class="fs-l">Canceladas</div><div class="fs-v">6</div><div class="fs-p fs-danger">18.8%</div></div>
+  <div class="funil-arr">›</div>
+  <div class="fs"><div class="fs-l">Realizadas</div><div class="fs-v">31</div><div class="fs-p fs-ok">✓</div></div>
+  <div class="funil-arr">›</div>
+  <div class="fs"><div class="fs-l">Vd. BDC</div><div class="fs-v">9</div><div class="fs-p fs-warn">29.0%</div></div>
+  <div class="funil-arr">›</div>
+  <div class="fs"><div class="fs-l">Fluxo</div><div class="fs-v">32</div><div class="fs-p fs-ok">show.</div></div>
+  <div class="funil-arr">›</div>
+  <div class="fs"><div class="fs-l">Vd. show.</div><div class="fs-v">9</div><div class="fs-p fs-warn">28.1%</div></div>
+</div></div>
+
+</div>
+
+<!-- ═══ BDC ═══ -->
+<div id="bdc" class="sec">
+
+<div class="loja-resumo">
+  <div class="lr-card">
+    <div class="lr-head"><span class="tag tag-bv">BV</span> <span class="lr-title">Boa Vista</span></div>
+    <div class="lr-grid">
+      <div class="lr-item"><div class="lr-v">11</div><div class="lr-l">Incluídos</div></div>
+      <div class="lr-item"><div class="lr-v" style="color:#1565C0">1</div><div class="lr-l">Agend.</div></div>
+      <div class="lr-item"><div class="lr-v" style="color:#C62828">1</div><div class="lr-l">Cancelados</div></div>
+      <div class="lr-item"><div class="lr-v" style="color:#2E7D32">2</div><div class="lr-l">Sucesso</div></div>
+      <div class="lr-item"><div class="lr-v">0</div><div class="lr-l">Faturados</div></div>
+      <div class="lr-item"><div class="lr-v" style="color:#E65100">33.3%</div><div class="lr-l">Conv.</div></div>
+    </div>
+  </div>
+  <div class="lr-card">
+    <div class="lr-head"><span class="tag tag-mns">MNS</span> <span class="lr-title">Manaus</span></div>
+    <div class="lr-grid">
+      <div class="lr-item"><div class="lr-v">102</div><div class="lr-l">Incluídos</div></div>
+      <div class="lr-item"><div class="lr-v" style="color:#1565C0">25</div><div class="lr-l">Agend.</div></div>
+      <div class="lr-item"><div class="lr-v" style="color:#C62828">5</div><div class="lr-l">Cancelados</div></div>
+      <div class="lr-item"><div class="lr-v" style="color:#2E7D32">7</div><div class="lr-l">Sucesso</div></div>
+      <div class="lr-item"><div class="lr-v">0</div><div class="lr-l">Faturados</div></div>
+      <div class="lr-item"><div class="lr-v" style="color:#E65100">28.0%</div><div class="lr-l">Conv.</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <span class="fl-label">Filtrar:</span>
+  <button class="fl-btn act-all" onclick="fc(['bdc-ag','bdc-suc'],'TODOS',this,'act-all')">Todos</button>
+  <button class="fl-btn" onclick="fc(['bdc-ag','bdc-suc'],'MNS',this,'act-mns')">🔵 Manaus</button>
+  <button class="fl-btn" onclick="fc(['bdc-ag','bdc-suc'],'BV',this,'act-bv')">🟣 Boa Vista</button>
+</div>
+
+<div class="sec-title">Agendamentos por vendedor</div>
+<div class="info-box">ℹ️ <div><strong>Ag. Total</strong> = todas as visitas agendadas no período &nbsp;·&nbsp; <strong>Cancelados</strong> = que não virão &nbsp;·&nbsp; <strong>Vis. Agend.</strong> = Total − Cancelados (pendentes confirmadas)</div></div>
+<div class="card-list" id="bdc-ag"><div class="vcard" data-loja="BV"><div class="vc-head"><div class="vc-left"><span class="vc-rank">1</span><span class="vc-name">Ninrod Rodriguez</span></div><div class="vc-right"><span class="tag tag-bv">BV</span> <span class="chip chip-ok">100.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">2</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">1</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">1</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">2</span><span class="vc-name">Matheus Botelho</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">100.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">3</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">3</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">0</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">3</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">3</span><span class="vc-name">Marlison Santos</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">100.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">2</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">1</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">1</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">4</span><span class="vc-name">Lívia Chagas</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">60.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">10</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">8</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">2</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">6</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">5</span><span class="vc-name">Humberto Andrade</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">55.6%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">9</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">5</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">0</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">5</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">6</span><span class="vc-name">Emelly Silva</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">44.4%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">9</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">4</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">0</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">4</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">7</span><span class="vc-name">Marcelo Ribeiro</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">44.4%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">9</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">4</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">0</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">4</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">8</span><span class="vc-name">Keith Anne</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">33.3%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">3</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">2</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">1</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">1</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">9</span><span class="vc-name">Evaristo Neto</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">8.3%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">12</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">0</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">1</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:42%;background:#C62828"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">10</span><span class="vc-name">Emihhayla Inahhyra</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">0</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">0</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:0%;background:#C62828"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">11</span><span class="vc-name">Fábio Aguiar</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">0</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">0</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:0%;background:#C62828"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">12</span><span class="vc-name">Paulo Hsouza</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">8</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">1</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">0</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:0%;background:#C62828"></div></div></div></div>
+<div class="vcard" data-loja="BV"><div class="vc-head"><div class="vc-left"><span class="vc-rank">13</span><span class="vc-name">Gabriel Soliveira</span></div><div class="vc-right"><span class="tag tag-bv">BV</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">2</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Ag. Total</div></div><div class="vc-item"><div class="vc-v" style="color:#C62828">0</div><div class="vc-l">Cancelados</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">0</div><div class="vc-l">Vis. Agend.</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">% Agend. vs meta 20%</div><div class="bar-bg"><div class="bar-f" style="width:0%;background:#C62828"></div></div></div></div>
+</div>
+
+<div class="sec-title">Sucesso BDC por vendedor</div>
+<div class="info-box">ℹ️ <div><strong>Meta 3 (conv. BDC)</strong> = Sucesso ÷ Visitas realizadas (meta 40%)</div></div>
+<div class="card-list" id="bdc-suc"><div class="vcard" data-loja="BV"><div class="vc-head"><div class="vc-left"><span class="vc-rank">1</span><span class="vc-name">Ninrod Rodriguez</span></div><div class="vc-right"><span class="tag tag-bv">BV</span> <span class="chip chip-ok">50.0%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">2</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">89</div><div class="vc-l">Carteira</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">2</span><span class="vc-name">Lívia Chagas</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">40.0%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">2</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">10</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">107</div><div class="vc-l">Carteira</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">3</span><span class="vc-name">Emelly Silva</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">40.0%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">2</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">9</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">48</div><div class="vc-l">Carteira</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">4</span><span class="vc-name">Humberto Andrade</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">20.0%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">1</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">9</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">150</div><div class="vc-l">Carteira</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">5</span><span class="vc-name">Evaristo Neto</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">33.3%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">1</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">12</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">108</div><div class="vc-l">Carteira</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">6</span><span class="vc-name">Marcelo Ribeiro</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">33.3%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">1</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">9</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">33</div><div class="vc-l">Carteira</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">7</span><span class="vc-name">Emihhayla Inahhyra</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">0</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Carteira</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">8</span><span class="vc-name">Fábio Aguiar</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">0</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Carteira</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">9</span><span class="vc-name">Matheus Botelho</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">0</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">3</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">55</div><div class="vc-l">Carteira</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">10</span><span class="vc-name">Marlison Santos</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">0</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">209</div><div class="vc-l">Carteira</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">11</span><span class="vc-name">Paulo Hsouza</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">0</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">8</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">14</div><div class="vc-l">Carteira</div></div></div></div>
+<div class="vcard" data-loja="BV"><div class="vc-head"><div class="vc-left"><span class="vc-rank">12</span><span class="vc-name">Gabriel Soliveira</span></div><div class="vc-right"><span class="tag tag-bv">BV</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">0</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">2</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">28</div><div class="vc-l">Carteira</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">13</span><span class="vc-name">Keith Anne</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">0</div><div class="vc-l">Sucesso</div></div><div class="vc-item"><div class="vc-v">0</div><div class="vc-l">Faturados</div></div><div class="vc-item"><div class="vc-v">3</div><div class="vc-l">Incluídos</div></div><div class="vc-item"><div class="vc-v">35</div><div class="vc-l">Carteira</div></div></div></div>
+</div>
+
+</div>
+
+<!-- ═══ FLUXO ═══ -->
+<div id="fluxo" class="sec">
+
+<div class="loja-resumo">
+  <div class="lr-card">
+    <div class="lr-head"><span class="tag tag-bv">BV</span> <span class="lr-title">Boa Vista</span></div>
+    <div class="lr-grid">
+      <div class="lr-item"><div class="lr-v">7</div><div class="lr-l">Fluxo</div></div>
+      <div class="lr-item"><div class="lr-v" style="color:#2E7D32">2</div><div class="lr-l">Vendidos</div></div>
+      <div class="lr-item"><div class="lr-v" style="color:#E65100">28.6%</div><div class="lr-l">Conversão</div></div>
+    </div>
+  </div>
+  <div class="lr-card">
+    <div class="lr-head"><span class="tag tag-mns">MNS</span> <span class="lr-title">Manaus</span></div>
+    <div class="lr-grid">
+      <div class="lr-item"><div class="lr-v">25</div><div class="lr-l">Fluxo</div></div>
+      <div class="lr-item"><div class="lr-v" style="color:#2E7D32">7</div><div class="lr-l">Vendidos</div></div>
+      <div class="lr-item"><div class="lr-v" style="color:#E65100">28.0%</div><div class="lr-l">Conversão</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <span class="fl-label">Filtrar:</span>
+  <button class="fl-btn act-all" onclick="fc(['fl-vend'],'TODOS',this,'act-all')">Todos</button>
+  <button class="fl-btn" onclick="fc(['fl-vend'],'MNS',this,'act-mns')">🔵 Manaus</button>
+  <button class="fl-btn" onclick="fc(['fl-vend'],'BV',this,'act-bv')">🟣 Boa Vista</button>
+</div>
+
+<div class="sec-title">Fluxo por vendedor</div>
+<div class="card-list" id="fl-vend"><div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">1</span><span class="vc-name">Emelly Silva</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">40.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">5</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">2</div><div class="vc-l">Vendidos</div></div><div class="vc-item"><div class="vc-v">40.0%</div><div class="vc-l">Conversão</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">Conv. vs meta 30%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">2</span><span class="vc-name">Lívia Chagas</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">40.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">5</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">2</div><div class="vc-l">Vendidos</div></div><div class="vc-item"><div class="vc-v">40.0%</div><div class="vc-l">Conversão</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">Conv. vs meta 30%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="BV"><div class="vc-head"><div class="vc-left"><span class="vc-rank">3</span><span class="vc-name">Ninrod Rodriguez</span></div><div class="vc-right"><span class="tag tag-bv">BV</span> <span class="chip chip-ok">40.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">5</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">2</div><div class="vc-l">Vendidos</div></div><div class="vc-item"><div class="vc-v">40.0%</div><div class="vc-l">Conversão</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">Conv. vs meta 30%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">4</span><span class="vc-name">Evaristo Neto</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">33.3%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">3</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">1</div><div class="vc-l">Vendidos</div></div><div class="vc-item"><div class="vc-v">33.3%</div><div class="vc-l">Conversão</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">Conv. vs meta 30%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">5</span><span class="vc-name">Humberto Andrade</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">20.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">5</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">1</div><div class="vc-l">Vendidos</div></div><div class="vc-item"><div class="vc-v">20.0%</div><div class="vc-l">Conversão</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">Conv. vs meta 30%</div><div class="bar-bg"><div class="bar-f" style="width:67%;background:#C62828"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">6</span><span class="vc-name">Marcelo Ribeiro</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-ok">33.3%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">3</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">1</div><div class="vc-l">Vendidos</div></div><div class="vc-item"><div class="vc-v">33.3%</div><div class="vc-l">Conversão</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">Conv. vs meta 30%</div><div class="bar-bg"><div class="bar-f" style="width:100%;background:#2E7D32"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">7</span><span class="vc-name">Emihhayla Inahhyra</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">0</div><div class="vc-l">Vendidos</div></div><div class="vc-item"><div class="vc-v">0.0%</div><div class="vc-l">Conversão</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">Conv. vs meta 30%</div><div class="bar-bg"><div class="bar-f" style="width:0%;background:#C62828"></div></div></div></div>
+<div class="vcard" data-loja="BV"><div class="vc-head"><div class="vc-left"><span class="vc-rank">8</span><span class="vc-name">Gabriel Soliveira</span></div><div class="vc-right"><span class="tag tag-bv">BV</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">2</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">0</div><div class="vc-l">Vendidos</div></div><div class="vc-item"><div class="vc-v">0.0%</div><div class="vc-l">Conversão</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">Conv. vs meta 30%</div><div class="bar-bg"><div class="bar-f" style="width:0%;background:#C62828"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">9</span><span class="vc-name">Keith Anne</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">2</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">0</div><div class="vc-l">Vendidos</div></div><div class="vc-item"><div class="vc-v">0.0%</div><div class="vc-l">Conversão</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">Conv. vs meta 30%</div><div class="bar-bg"><div class="bar-f" style="width:0%;background:#C62828"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">10</span><span class="vc-name">Paulo Hsouza</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">0.0%</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v">1</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#2E7D32">0</div><div class="vc-l">Vendidos</div></div><div class="vc-item"><div class="vc-v">0.0%</div><div class="vc-l">Conversão</div></div></div><div class="vc-bar"><div style="font-size:10px;color:#78909C;margin-bottom:3px">Conv. vs meta 30%</div><div class="bar-bg"><div class="bar-f" style="width:0%;background:#C62828"></div></div></div></div>
+</div>
+
+</div>
+
+<!-- ═══ FEIRÃO ═══ -->
+<div id="feirao" class="sec">
+
+<div class="sec-title" style="margin-top:0">Filtrar por mês</div>
+<div class="feirao-filter" id="feirao-filter"></div>
+<div id="feirao-display"></div>
+
+</div>
+
+<!-- ═══ EQUIPE ═══ -->
+<div id="vendedores" class="sec">
+
+<div class="filter-bar">
+  <span class="fl-label">Filtrar:</span>
+  <button class="fl-btn act-all" onclick="fc(['rk','vis'],'TODOS',this,'act-all')">Todos</button>
+  <button class="fl-btn" onclick="fc(['rk','vis'],'MNS',this,'act-mns')">🔵 Manaus</button>
+  <button class="fl-btn" onclick="fc(['rk','vis'],'BV',this,'act-bv')">🟣 Boa Vista</button>
+</div>
+
+<div class="info-box">ℹ️ <div><strong>Meta/vendedor:</strong> 5 BDC + 7–8 Fluxo = <strong>13–15 vendas/mês</strong></div></div>
+
+<div class="sec-title">Ranking combinado BDC + Fluxo</div>
+<div class="card-list" id="rk"><div class="vcard" data-loja="BV"><div class="vc-head"><div class="vc-left"><span class="vc-rank">1</span><span class="vc-name">Ninrod Rodriguez</span></div><div class="vc-right"><span class="tag tag-bv">BV</span> <span class="chip chip-danger">Abaixo</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v" style="color:#1565C0">2</div><div class="vc-l">BDC</div></div><div class="vc-item"><div class="vc-v" style="color:#2E7D32">2</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#333;font-weight:700">4</div><div class="vc-l">Total</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">2</span><span class="vc-name">Lívia Chagas</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">Abaixo</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v" style="color:#1565C0">2</div><div class="vc-l">BDC</div></div><div class="vc-item"><div class="vc-v" style="color:#2E7D32">2</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#333;font-weight:700">4</div><div class="vc-l">Total</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">3</span><span class="vc-name">Emelly Silva</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">Abaixo</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v" style="color:#1565C0">2</div><div class="vc-l">BDC</div></div><div class="vc-item"><div class="vc-v" style="color:#2E7D32">2</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#333;font-weight:700">4</div><div class="vc-l">Total</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">4</span><span class="vc-name">Humberto Andrade</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">Abaixo</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v" style="color:#1565C0">1</div><div class="vc-l">BDC</div></div><div class="vc-item"><div class="vc-v" style="color:#2E7D32">1</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#333;font-weight:700">2</div><div class="vc-l">Total</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">5</span><span class="vc-name">Evaristo Neto</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">Abaixo</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v" style="color:#1565C0">1</div><div class="vc-l">BDC</div></div><div class="vc-item"><div class="vc-v" style="color:#2E7D32">1</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#333;font-weight:700">2</div><div class="vc-l">Total</div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">6</span><span class="vc-name">Marcelo Ribeiro</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span> <span class="chip chip-danger">Abaixo</span></div></div><div class="vc-grid"><div class="vc-item"><div class="vc-v" style="color:#1565C0">1</div><div class="vc-l">BDC</div></div><div class="vc-item"><div class="vc-v" style="color:#2E7D32">1</div><div class="vc-l">Fluxo</div></div><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#333;font-weight:700">2</div><div class="vc-l">Total</div></div></div></div>
+</div>
+
+<div class="sec-title">Pipeline de visitas agendadas</div>
+<div class="card-list" id="vis"><div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">1</span><span class="vc-name">Humberto Andrade</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">19</div><div class="vc-l">Vis. agend.</div></div><div class="vc-item"><div class="vc-v" style="color:#E65100">~8</div><div class="vc-l">Pot. vendas</div></div><div class="vc-item"><div class="vc-v">150</div><div class="vc-l">Carteira</div></div></div><div class="vc-bar"><div class="bar-bg"><div class="bar-f" style="width:69%;background:#1565C0"></div></div></div></div>
+<div class="vcard" data-loja="BV"><div class="vc-head"><div class="vc-left"><span class="vc-rank">2</span><span class="vc-name">Ninrod Rodriguez</span></div><div class="vc-right"><span class="tag tag-bv">BV</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">13</div><div class="vc-l">Vis. agend.</div></div><div class="vc-item"><div class="vc-v" style="color:#E65100">~5</div><div class="vc-l">Pot. vendas</div></div><div class="vc-item"><div class="vc-v">89</div><div class="vc-l">Carteira</div></div></div><div class="vc-bar"><div class="bar-bg"><div class="bar-f" style="width:47%;background:#1565C0"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">3</span><span class="vc-name">Lívia Chagas</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">7</div><div class="vc-l">Vis. agend.</div></div><div class="vc-item"><div class="vc-v" style="color:#E65100">~3</div><div class="vc-l">Pot. vendas</div></div><div class="vc-item"><div class="vc-v">107</div><div class="vc-l">Carteira</div></div></div><div class="vc-bar"><div class="bar-bg"><div class="bar-f" style="width:25%;background:#1565C0"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">4</span><span class="vc-name">Marcelo Ribeiro</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">4</div><div class="vc-l">Vis. agend.</div></div><div class="vc-item"><div class="vc-v" style="color:#E65100">~2</div><div class="vc-l">Pot. vendas</div></div><div class="vc-item"><div class="vc-v">33</div><div class="vc-l">Carteira</div></div></div><div class="vc-bar"><div class="bar-bg"><div class="bar-f" style="width:15%;background:#1565C0"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">5</span><span class="vc-name">Matheus Botelho</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">4</div><div class="vc-l">Vis. agend.</div></div><div class="vc-item"><div class="vc-v" style="color:#E65100">~2</div><div class="vc-l">Pot. vendas</div></div><div class="vc-item"><div class="vc-v">55</div><div class="vc-l">Carteira</div></div></div><div class="vc-bar"><div class="bar-bg"><div class="bar-f" style="width:15%;background:#1565C0"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">6</span><span class="vc-name">Emelly Silva</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">3</div><div class="vc-l">Vis. agend.</div></div><div class="vc-item"><div class="vc-v" style="color:#E65100">~1</div><div class="vc-l">Pot. vendas</div></div><div class="vc-item"><div class="vc-v">48</div><div class="vc-l">Carteira</div></div></div><div class="vc-bar"><div class="bar-bg"><div class="bar-f" style="width:11%;background:#1565C0"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">7</span><span class="vc-name">Marlison Santos</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">2</div><div class="vc-l">Vis. agend.</div></div><div class="vc-item"><div class="vc-v" style="color:#E65100">~1</div><div class="vc-l">Pot. vendas</div></div><div class="vc-item"><div class="vc-v">209</div><div class="vc-l">Carteira</div></div></div><div class="vc-bar"><div class="bar-bg"><div class="bar-f" style="width:7%;background:#1565C0"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">8</span><span class="vc-name">Evaristo Neto</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">1</div><div class="vc-l">Vis. agend.</div></div><div class="vc-item"><div class="vc-v" style="color:#E65100">~0</div><div class="vc-l">Pot. vendas</div></div><div class="vc-item"><div class="vc-v">108</div><div class="vc-l">Carteira</div></div></div><div class="vc-bar"><div class="bar-bg"><div class="bar-f" style="width:4%;background:#1565C0"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">9</span><span class="vc-name">Keith Anne</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">1</div><div class="vc-l">Vis. agend.</div></div><div class="vc-item"><div class="vc-v" style="color:#E65100">~0</div><div class="vc-l">Pot. vendas</div></div><div class="vc-item"><div class="vc-v">35</div><div class="vc-l">Carteira</div></div></div><div class="vc-bar"><div class="bar-bg"><div class="bar-f" style="width:4%;background:#1565C0"></div></div></div></div>
+<div class="vcard" data-loja="MNS"><div class="vc-head"><div class="vc-left"><span class="vc-rank">10</span><span class="vc-name">Paulo Hsouza</span></div><div class="vc-right"><span class="tag tag-mns">MNS</span></div></div><div class="vc-grid"><div class="vc-item vc-item-hl"><div class="vc-v" style="color:#1565C0">1</div><div class="vc-l">Vis. agend.</div></div><div class="vc-item"><div class="vc-v" style="color:#E65100">~0</div><div class="vc-l">Pot. vendas</div></div><div class="vc-item"><div class="vc-v">14</div><div class="vc-l">Carteira</div></div></div><div class="vc-bar"><div class="bar-bg"><div class="bar-f" style="width:4%;background:#1565C0"></div></div></div></div>
+</div>
+
+</div>
+</div>
+
+<div class="footer">Autoparvi Seminovos · Regional Norte · Syonet CRM · Gerado em 03/06/2026</div>
+
+<script>
+const FEIRAOES = [
+  { nome: `Arena das Marcas`, mes: `Março/2026`, fluxo: 0, vendas: 0, conv: 0.0, rows: `<div class="ft-row"><div class="ft-n">Antônia Tatiany <span class="tag tag-bv">BV</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">0</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#999">—</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Emelly Silva <span class="tag tag-mns">MNS</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">0</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#999">—</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row ft-total"><div class="ft-n">TOTAL</div><div class="ft-cols"><div class="ft-c"><div class="ft-v">0</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#E65100">0.0%</div><div class="ft-l">Conv.</div></div></div></div>` },
+  { nome: `48h de Ofertas`, mes: `Março/2026`, fluxo: 0, vendas: 0, conv: 0.0, rows: `<div class="ft-row"><div class="ft-n">Antônia Tatiany <span class="tag tag-bv">BV</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">0</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#999">—</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row ft-total"><div class="ft-n">TOTAL</div><div class="ft-cols"><div class="ft-c"><div class="ft-v">0</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#E65100">0.0%</div><div class="ft-l">Conv.</div></div></div></div>` },
+  { nome: `Missão Impossível`, mes: `Abril/2026`, fluxo: 0, vendas: 0, conv: 0.0, rows: `<div class="ft-row"><div class="ft-n">Antônia Tatiany <span class="tag tag-bv">BV</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">0</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#999">—</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Emelly Silva <span class="tag tag-mns">MNS</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">0</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#999">—</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row ft-total"><div class="ft-n">TOTAL</div><div class="ft-cols"><div class="ft-c"><div class="ft-v">0</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#E65100">0.0%</div><div class="ft-l">Conv.</div></div></div></div>` },
+  { nome: `48h de Ofertas`, mes: `Maio/2026`, fluxo: 55, vendas: 10, conv: 18.2, rows: `<div class="ft-row"><div class="ft-n">Ninrod Rodriguez <span class="tag tag-bv">BV</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">3</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">3</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">100%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Humberto Andrade <span class="tag tag-mns">MNS</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">9</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">2</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#E65100">22%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Lívia Chagas <span class="tag tag-mns">MNS</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">4</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">2</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">50%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Emelly Silva <span class="tag tag-mns">MNS</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">6</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">1</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#E65100">17%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Keith Anne <span class="tag tag-mns">MNS</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">7</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">1</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#E65100">14%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Lucas Viana <span class="tag tag-mns">MNS</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">2</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">1</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">50%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Antônia Tatiany <span class="tag tag-bv">BV</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">4</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Evaristo Neto <span class="tag tag-mns">MNS</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">8</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Fábio Aguiar <span class="tag tag-mns">MNS</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">3</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Gabriel Soliveira <span class="tag tag-bv">BV</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">4</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Marcelo Ribeiro <span class="tag tag-mns">MNS</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">2</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Marlison Santos <span class="tag tag-mns">MNS</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">2</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row"><div class="ft-n">Paulo Hsouza <span class="tag tag-mns">MNS</span></div><div class="ft-cols"><div class="ft-c"><div class="ft-v">1</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#999">0%</div><div class="ft-l">Conv.</div></div></div></div><div class="ft-row ft-total"><div class="ft-n">TOTAL</div><div class="ft-cols"><div class="ft-c"><div class="ft-v">55</div><div class="ft-l">Fluxo</div></div><div class="ft-c"><div class="ft-v" style="color:#2E7D32">10</div><div class="ft-l">Vendas</div></div><div class="ft-c"><div class="ft-v" style="color:#E65100">18.2%</div><div class="ft-l">Conv.</div></div></div></div>` },
+];
+
+// ── Filtros ──────────────────────────────────────
+function fc(ids, loja, btn, cls) {
+  const bar = btn.parentElement;
+  bar.querySelectorAll('.fl-btn').forEach(b => b.className = 'fl-btn');
+  btn.classList.add(cls);
+  ids.forEach(id => {
+    const c = document.getElementById(id);
+    if (!c) return;
+    c.querySelectorAll('.vcard').forEach(card => {
+      card.classList.toggle('hidden', loja !== 'TODOS' && card.dataset.loja !== loja);
+    });
+  });
+}
+
+// ── Tabs ─────────────────────────────────────────
+function show(id, el) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ── Feirão ───────────────────────────────────────
+let feiraoAtual = null;
+
+function initFeirao() {
+  const filter = document.getElementById('feirao-filter');
+  const display = document.getElementById('feirao-display');
+  
+  // Meses únicos
+  const meses = [...new Set(FEIRAOES.map(f => f.mes))];
+  
+  // Botão "Todos os meses"
+  const btnTodos = document.createElement('button');
+  btnTodos.className = 'fl-btn act-all';
+  btnTodos.textContent = 'Todos';
+  btnTodos.onclick = () => {
+    filter.querySelectorAll('.fl-btn').forEach(b => b.className = 'fl-btn');
+    btnTodos.classList.add('act-all');
+    renderFeirao(null);
+  };
+  filter.appendChild(btnTodos);
+
+  // Botões por mês
+  meses.forEach(mes => {
+    const btn = document.createElement('button');
+    btn.className = 'fl-btn';
+    btn.textContent = mes;
+    btn.onclick = () => {
+      filter.querySelectorAll('.fl-btn').forEach(b => b.className = 'fl-btn');
+      btn.classList.add('act-all');
+      renderFeirao(mes);
+    };
+    filter.appendChild(btn);
+  });
+
+  renderFeirao(null);
+}
+
+function renderFeirao(mesFiltro) {
+  const display = document.getElementById('feirao-display');
+  const lista = mesFiltro ? FEIRAOES.filter(f => f.mes === mesFiltro) : FEIRAOES;
+
+  if (lista.length === 0) {
+    display.innerHTML = '<div class="info-box">ℹ️ <div>Nenhum feirão registrado para este mês.</div></div>';
+    return;
+  }
+
+  display.innerHTML = lista.map(f => `
+    <div style="margin-bottom:16px">
+      <div class="feirao-content">
+        <div class="feirao-head">
+          <div>
+            <div class="feirao-head-title">🔥 ${f.nome}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">${f.mes}</div>
+          </div>
+          <div class="feirao-head-stats">
+            <div class="fhs"><div class="fhs-v">${f.fluxo}</div><div class="fhs-l">Fluxo</div></div>
+            <div class="fhs"><div class="fhs-v" style="color:var(--green)">${f.vendas}</div><div class="fhs-l">Vendas</div></div>
+            <div class="fhs"><div class="fhs-v" style="color:var(--orange)">${f.conv.toFixed(1)}%</div><div class="fhs-l">Conv.</div></div>
+          </div>
+        </div>
+        ${f.rows}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Init ─────────────────────────────────────────
+initFeirao();
+</script>
+</body>
+</html>
